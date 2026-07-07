@@ -11,13 +11,4 @@ private:
     float value;
 public:
     Detector(/* args */);
-    ~Detector();
 };
-
-Detector::Detector(/* args */)
-{
-}
-
-Detector::~Detector()
-{
-}

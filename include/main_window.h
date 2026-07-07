@@ -7,4 +7,5 @@ private:
     
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 };
