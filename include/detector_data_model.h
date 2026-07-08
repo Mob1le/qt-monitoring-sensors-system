@@ -3,12 +3,12 @@
 #include <QAbstractTableModel>
 #include <QVector>
 
-class DetectorModel : public QAbstractTableModel
+class DetectorDataModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    DetectorModel(QObject *parent = nullptr);
-    ~DetectorModel() override;
+    DetectorDataModel(QObject *parent = nullptr);
+    ~DetectorDataModel() override;
 
     
     //Перегрузка для кастомной модели
