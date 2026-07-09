@@ -8,21 +8,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5 REQUIRED COMPONENTS
-    Core
     Widgets
-    Gui
 )
 
 add_executable(${PROJECT_NAME} WIN32
     src/main.cpp
     src/main_window.cpp
     include/main_window.h
-    include/detector_data_model.h
-    src/detector_data_model.cpp
-    include/detector.h
-    src/detector.cpp
-    include/detector_generator.h
-    src/detector_generator.cpp
+    include/detector_table_model.h
+    src/detector_table_model.cpp
+    include/detector_data_generator.h
+    src/detector_data_generator.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -30,7 +26,5 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt5::Core
     Qt5::Widgets
-    Qt5::Gui
 )

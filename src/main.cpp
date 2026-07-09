@@ -1,12 +1,18 @@
 #include <QApplication>
 #include "main_window.h"
+#include "detector_table_model.h"
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    
+    qRegisterMetaType<DetectorData>("DetectorData");
+    qRegisterMetaType<QVector<DetectorData>>("QVector<DetectorData>");
+    qRegisterMetaType<QVector<float>>("QVector<float>");
+    
+    app.setStyle("Fusion");
+    
     MainWindow window;
-    window.setWindowTitle("Temperature Detectors");
     window.show();
-
-    return a.exec();
+    
+    return app.exec();
 }
