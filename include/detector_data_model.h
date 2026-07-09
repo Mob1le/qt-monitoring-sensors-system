@@ -9,7 +9,8 @@ class DetectorDataModel : public QAbstractTableModel
 {
     Q_OBJECT
 private:
-    QHash<qint64, Detector> dataHash;
+    QHash<qint64, Detector> m_data;
+    QHash<qint64, int> id_row;
     mutable QMutex mutex;
 public:
     explicit DetectorDataModel(QObject *parent = nullptr);
@@ -23,4 +24,5 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     void updateData(const Detector &detector);
+    void addData(const Detector &detector);
 };
