@@ -71,25 +71,18 @@ void DetectorDataModel::addData(const Detector &detector)
     const qint64 id = detector.getId();
 
     if (m_data.contains(id))
-        return;
+    {
+        const int row = id_row[id];
+        m_data[id] = detector;
 
-    const int row = m_data.size();
-    beginInsertRows(QModelIndex(), row, row);
-    m_data.insert(id, detector);
-    id_row.insert(id, row);
-    endInsertRows();
-}
-
-void DetectorDataModel::updateData(const Detector &detector)
-{
-    QMutexLocker locker(&mutex);
-
-    const qint64 id = detector.getId();
-    if (!id_row.contains(id))
-        return;
-
-    const int row = id_row[id];
-    m_data[id] = detector;
-
-    emit dataChanged(index(row, 0), index(row, columnCount() - 1), {Qt::DisplayRole});
+        emit dataChanged(index(row, 0), index(row, columnCount() - 1), {Qt::DisplayRole}); // TODO
+    }
+    else
+    {
+        const int row = m_data.size();
+        beginInsertRows(QModelIndex(), row, row);
+        m_data.insert(id, detector);
+        id_row.insert(id, row);
+        endInsertRows();
+    }
 }
