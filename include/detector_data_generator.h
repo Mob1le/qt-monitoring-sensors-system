@@ -1,4 +1,3 @@
-// DetectorDataGenerator.h
 #pragma once
 #include <QObject>
 #include <QVector>

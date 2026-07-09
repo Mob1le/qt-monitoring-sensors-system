@@ -1,4 +1,3 @@
-// MainWindow.h
 #pragma once
 #include <QMainWindow>
 #include <QTableView>
@@ -36,14 +35,9 @@ private:
     QLabel *m_avgLabel;
     QLabel *m_minLabel;
     QLabel *m_maxLabel;
-    QLabel *m_updateRateLabel;  // Частота обновления
 
     // Данные и поток
     DetectorTableModel *m_model;
     QThread *m_workerThread;
     DetectorDataGenerator *m_generator;
-    
-    // Для измерения производительности
-    QElapsedTimer m_fpsTimer;
-    int m_updateCounter = 0;
 };

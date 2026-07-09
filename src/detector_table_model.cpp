@@ -1,4 +1,3 @@
-// DetectorTableModel.cpp
 #include "detector_table_model.h"
 #include <algorithm>
 #include <limits>
@@ -21,12 +20,19 @@ QVariant DetectorTableModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.row() >= m_data.size())
         return QVariant();
 
+    const DetectorData &row = m_data[index.row()];
     if (role == Qt::DisplayRole) {
-        const DetectorData &row = m_data[index.row()];
         switch (index.column()) {
         case ColID:        return row.id;
         case ColTimestamp: return row.timestamp.toString("yyyy-MM-dd hh:mm:ss.zzz");
         case ColValue:     return QString::number(row.value, 'f', 3);
+        }
+    }
+    else if (role == Qt::UserRole) {
+        switch (index.column()) {
+        case ColID:        return row.id;           // int
+        case ColTimestamp: return row.timestamp;     // QDateTime
+        case ColValue:     return row.value;         // float
         }
     }
     return QVariant();
@@ -81,7 +87,6 @@ void DetectorTableModel::updateValues(const QVector<float> &newValues) {
     beginResetModel();
     endResetModel();
     
-    // Оповещаем об обновлении всей таблицы
     emit dataChanged();  // Для статистики
 }
 
@@ -96,7 +101,6 @@ void DetectorTableModel::clearData() {
     emit dataChanged();
 }
 
-// Оптимизированная статистика с кэшированием
 void DetectorTableModel::invalidateStats() {
     m_statsDirty = true;
 }

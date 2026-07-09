@@ -1,4 +1,3 @@
-// DetectorTableModel.h
 #pragma once
 #include <QAbstractTableModel>
 #include <QMutex>

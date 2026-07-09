@@ -19,6 +19,7 @@ add_executable(${PROJECT_NAME} WIN32
     src/detector_table_model.cpp
     include/detector_data_generator.h
     src/detector_data_generator.cpp
+    include/proxy_model/normal_sort_proxy_model.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

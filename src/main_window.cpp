@@ -1,5 +1,5 @@
-// MainWindow.cpp
 #include "main_window.h"
+#include "proxy_model/normal_sort_proxy_model.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -46,7 +46,6 @@ void MainWindow::setupUI() {
     m_avgLabel = new QLabel("0.000", this);
     m_minLabel = new QLabel("0.000", this);
     m_maxLabel = new QLabel("0.000", this);
-    m_updateRateLabel = new QLabel("0 Hz", this);
     
     // Стилизация статистики
     QFont boldFont;
@@ -55,26 +54,34 @@ void MainWindow::setupUI() {
     m_avgLabel->setFont(boldFont);
     m_minLabel->setFont(boldFont);
     m_maxLabel->setFont(boldFont);
-    m_updateRateLabel->setFont(boldFont);
     
     statsLayout->addRow("Активных датчиков:", m_totalLabel);
     statsLayout->addRow("Среднее значение:", m_avgLabel);
     statsLayout->addRow("Минимальное значение:", m_minLabel);
     statsLayout->addRow("Максимальное значение:", m_maxLabel);
-    statsLayout->addRow("Частота обновления:", m_updateRateLabel);
     
     mainLayout->addWidget(statsGroup);
 
     // Таблица
     m_tableView = new QTableView(this);
     m_model = new DetectorTableModel(this);
-    m_tableView->setModel(m_model);
+
+    NumericSortProxyModel *proxyModel = new NumericSortProxyModel(this);
+
+    proxyModel->setSourceModel(m_model);
+    proxyModel->setDynamicSortFilter(true);  // Автоматическая пересортировка при изменении данных
+    
+    // Устанавливаем прокси-модель в таблицу
+    m_tableView->setModel(proxyModel);
+
     m_tableView->setAlternatingRowColors(true);
     m_tableView->horizontalHeader()->setStretchLastSection(true);
     m_tableView->verticalHeader()->setVisible(false);  // Скрываем номера строк
     
     // Оптимизация для большого количества строк
     m_tableView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+    m_tableView->setSortingEnabled(true);
     
     mainLayout->addWidget(m_tableView);
 
@@ -107,10 +114,6 @@ void MainWindow::onStartClicked() {
     // Очищаем старые данные
     m_model->clearData();
     
-    // Сбрасываем счетчик FPS
-    m_updateCounter = 0;
-    m_fpsTimer.start();
-    
     // Запускаем генерацию 10000 датчиков с обновлением каждые 50 мс
     QMetaObject::invokeMethod(m_generator, "startGeneration",
                              Qt::QueuedConnection,
@@ -131,15 +134,6 @@ void MainWindow::onDetectorsInitialized(int count) {
 
 void MainWindow::onValuesUpdated(const QVector<float> &newValues) {
     m_model->updateValues(newValues);
-    
-    // Подсчет FPS
-    m_updateCounter++;
-    if (m_fpsTimer.elapsed() >= 1000) {
-        float fps = m_updateCounter * 1000.0f / m_fpsTimer.elapsed();
-        m_updateRateLabel->setText(QString::number(fps, 'f', 1) + " Hz");
-        m_updateCounter = 0;
-        m_fpsTimer.restart();
-    }
 }
 
 void MainWindow::updateStatistics() {
