@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 #include <QHash>
 #include <QMutex>
+#include <QVector>
 
 class DetectorDataModel : public QAbstractTableModel
 {
@@ -22,5 +23,8 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-    void addData(const Detector &detector);
+public slots:
+    void addData(Detector detector);
 };
+
+Q_DECLARE_METATYPE(Detector)

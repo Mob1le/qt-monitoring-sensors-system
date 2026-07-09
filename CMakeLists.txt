@@ -21,6 +21,8 @@ add_executable(${PROJECT_NAME} WIN32
     src/detector_data_model.cpp
     include/detector.h
     src/detector.cpp
+    include/detector_generator.h
+    src/detector_generator.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

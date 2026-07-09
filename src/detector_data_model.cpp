@@ -17,31 +17,43 @@ int DetectorDataModel::rowCount(const QModelIndex &parent) const
 // Поле: ID (qint64), значение (float), время (QDateTime). = 3
 int DetectorDataModel::columnCount(const QModelIndex &parent) const
 {
+    QMutexLocker locker(&mutex);
     return 3;
 }
 
 QVariant DetectorDataModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= m_data.size())
-    {
+    if (!index.isValid())
         return QVariant();
-    }
 
     QMutexLocker locker(&mutex);
-
-    const Detector &detector = m_data.values()[index.row()];
-
-    switch (index.column())
+    if (role == Qt::DisplayRole)
     {
-    case 0: // ID
-        return role == Qt::DisplayRole ? QString::number(detector.getId()) : QVariant();
-    case 1: // Value
-        return role == Qt::DisplayRole ? QString::number(detector.getValue(), 'f', 2) : QVariant();
-    case 2: // Time
-        return role == Qt::DisplayRole ? detector.getTimestamp().toString("dd.MM.yyyy HH:mm:ss") : QVariant();
-    default:
-        return QVariant();
+        const Detector &detector = m_data[index.row()];
+        switch (index.column())
+        {
+        case 0:
+            return detector.getId();
+        case 1:
+            return detector.getValue();
+        case 2:
+            return detector.getTimestamp().toString("yyyy-MM-dd HH:mm:ss");
+        }
     }
+    else if (role == Qt::EditRole)
+    {
+        const Detector &detector = m_data[index.row()];
+        switch (index.column())
+        {
+        case 0:
+            return detector.getId();
+        case 1:
+            return detector.getValue();
+        case 2:
+            return detector.getTimestamp();
+        }
+    }
+    return QVariant();
 }
 
 QVariant DetectorDataModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -64,25 +76,33 @@ QVariant DetectorDataModel::headerData(int section, Qt::Orientation orientation,
     }
 }
 
-void DetectorDataModel::addData(const Detector &detector)
+void DetectorDataModel::addData(Detector detector)
 {
-    QMutexLocker locker(&mutex);
-
     const qint64 id = detector.getId();
-
     if (m_data.contains(id))
     {
         const int row = id_row[id];
-        m_data[id] = detector;
+        if (row < 0 || row >= rowCount())
+            return;
 
-        emit dataChanged(index(row, 0), index(row, columnCount() - 1), {Qt::DisplayRole}); // TODO
+        int lastColumn = columnCount() - 1;
+        if (lastColumn < 0)
+            return;
+
+        QModelIndex topLeft = index(row, 0);
+        QModelIndex bottomRight = index(row, lastColumn);
+        if (topLeft.isValid() && bottomRight.isValid())
+        {
+            m_data[id] = detector;
+            emit dataChanged(topLeft, bottomRight, {Qt::DisplayRole, Qt::EditRole});
+        }
     }
     else
     {
         const int row = m_data.size();
         beginInsertRows(QModelIndex(), row, row);
-        m_data.insert(id, detector);
         id_row.insert(id, row);
+        m_data.insert(id, detector);
         endInsertRows();
     }
 }

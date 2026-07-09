@@ -1,7 +1,8 @@
 #include "main_window.h"
 
-MainWindow::MainWindow(QWidget* parent) : QWidget(parent)
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
+    qRegisterMetaType<Detector>("Detector");
     data_model = new DetectorDataModel(this);
 
     sort_filter_model = new QSortFilterProxyModel(this);
@@ -18,35 +19,51 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent)
     start_stop_button->setCheckable(true);
     start_stop_button->setFixedWidth(120);
 
-
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QHBoxLayout *controlsLayout = new QHBoxLayout();
 
     controlsLayout->addWidget(start_stop_button);
     controlsLayout->addWidget(statistics_label);
-    controlsLayout->addStretch(); // чтобы кнопки слева, статистика справа
+    controlsLayout->addStretch();
 
     mainLayout->addLayout(controlsLayout);
     mainLayout->addWidget(table_view);
 
-    connect(start_stop_button, &QPushButton::clicked,
-            this, &MainWindow::onStartStopClicked);
+    
 
+    detector_generator.moveToThread(&gen_thread);
+    connect(&gen_thread, &QThread::started, &detector_generator, &DetectorGenerator::process);
+    connect(&detector_generator, &DetectorGenerator::finished, &gen_thread, &QThread::quit);
+    connect(&gen_thread, &QThread::finished, &gen_thread, &QObject::deleteLater);
+
+    connect(start_stop_button, &QPushButton::clicked, this, &MainWindow::onStartStopClicked);
+    connect(&detector_generator, &DetectorGenerator::sendDetector, data_model, &DetectorDataModel::addData, Qt::QueuedConnection);
+    
     setMinimumSize(800, 600);
 }
 
-MainWindow::~MainWindow() {}
-
+MainWindow::~MainWindow() 
+{
+    if (gen_thread.isRunning()) {
+        detector_generator.setRunning(false);
+        gen_thread.quit();                     // Запрос на выход из event loop
+        gen_thread.wait();                     // Ждём завершения (безопасно)
+    }
+}
 
 void MainWindow::onStartStopClicked()
 {
-    if (start_stop_button->isChecked()) {
+    if (start_stop_button->isChecked())
+    {
         start_stop_button->setText("Стоп");
-        // тут будет вызов generator->start()
+        detector_generator.setRunning(true);
+        gen_thread.start();
         // statisticsCalculator->start();
-    } else {
+    }
+    else
+    {
         start_stop_button->setText("Старт");
-        // generator->stop()
+        detector_generator.setRunning(false);
         // statisticsCalculator->stop()
     }
 }

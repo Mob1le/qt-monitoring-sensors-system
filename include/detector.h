@@ -2,6 +2,7 @@
 
 #include <QDateTime>
 
+
 class Detector
 {
 private:
@@ -21,3 +22,4 @@ public:
     float getValue() const;
     void setValue(float newValue);
 };
+
