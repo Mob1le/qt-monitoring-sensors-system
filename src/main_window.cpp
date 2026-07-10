@@ -1,16 +1,9 @@
 #include "main_window.h"
-#include "proxy_model/normal_sort_proxy_model.h"
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGroupBox>
-#include <QFormLayout>
-#include <QHeaderView>
-#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setupUI();
     setupThread();
-    setWindowTitle("10000 Detectors Monitor");
+    setWindowTitle("СИСТЕМА МОНИТОРИНГА 10000 ДАТЧИКОВ");
     resize(800, 600);
 }
 
@@ -28,10 +21,12 @@ void MainWindow::setupUI() {
     QHBoxLayout *btnLayout = new QHBoxLayout();
     m_startButton = new QPushButton("Старт", this);
     m_stopButton = new QPushButton("Стоп", this);
+    m_filterCheckBox = new QCheckBox("Фильтрация (> 50)", this);
     m_stopButton->setEnabled(false);
     
     btnLayout->addWidget(m_startButton);
     btnLayout->addWidget(m_stopButton);
+    btnLayout->addWidget(m_filterCheckBox);
     btnLayout->addStretch();
     mainLayout->addLayout(btnLayout);
 
@@ -44,14 +39,6 @@ void MainWindow::setupUI() {
     m_minLabel = new QLabel("0.000", this);
     m_maxLabel = new QLabel("0.000", this);
     
-    // Стилизация статистики
-    QFont boldFont;
-    boldFont.setBold(true);
-    m_totalLabel->setFont(boldFont);
-    m_avgLabel->setFont(boldFont);
-    m_minLabel->setFont(boldFont);
-    m_maxLabel->setFont(boldFont);
-    
     statsLayout->addRow("Активных датчиков:", m_totalLabel);
     statsLayout->addRow("Среднее значение:", m_avgLabel);
     statsLayout->addRow("Минимальное значение:", m_minLabel);
@@ -63,21 +50,17 @@ void MainWindow::setupUI() {
     m_tableView = new QTableView(this);
     m_model = new DetectorTableModel(this);
 
-    NumericSortProxyModel *proxyModel = new NumericSortProxyModel(this);
+    proxyModel = new DetectorsProxyModel(this);
 
     proxyModel->setSourceModel(m_model);
     proxyModel->setDynamicSortFilter(true);  // Автоматическая пересортировка при изменении данных
     
     // Устанавливаем прокси-модель в таблицу
     m_tableView->setModel(proxyModel);
-
     m_tableView->setAlternatingRowColors(true);
     m_tableView->horizontalHeader()->setStretchLastSection(true);
     m_tableView->verticalHeader()->setVisible(false);
-    
-    // Оптимизация для большого количества строк
     m_tableView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-
     m_tableView->setSortingEnabled(true);
     
     mainLayout->addWidget(m_tableView);
@@ -87,6 +70,7 @@ void MainWindow::setupUI() {
     connect(m_startButton, &QPushButton::clicked, this, &MainWindow::onStartClicked);
     connect(m_stopButton, &QPushButton::clicked, this, &MainWindow::onStopClicked);
     connect(m_model, &DetectorTableModel::dataChanged, this, &MainWindow::updateStatistics);
+    connect(m_filterCheckBox, &QCheckBox::toggled, this, &MainWindow::onFilterChanged);
 }
 
 void MainWindow::setupThread() {
@@ -125,7 +109,6 @@ void MainWindow::onStopClicked() {
 
 void MainWindow::onDetectorsInitialized(int count) {
     m_model->initDetectors(count);
-    setWindowTitle(QString("Detectors Monitor - Initialized %1 detectors").arg(count));
 }
 
 void MainWindow::onValuesUpdated(const QVector<float> &newValues) {
@@ -137,4 +120,9 @@ void MainWindow::updateStatistics() {
     m_avgLabel->setText(QString::number(m_model->averageValue(), 'f', 3));
     m_minLabel->setText(QString::number(m_model->minValue(), 'f', 3));
     m_maxLabel->setText(QString::number(m_model->maxValue(), 'f', 3));
+}
+
+void MainWindow::onFilterChanged()
+{
+    proxyModel->enableFiltration(m_filterCheckBox->isChecked());   
 }

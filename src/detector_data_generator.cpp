@@ -16,7 +16,7 @@ void DetectorDataGenerator::startGeneration(int detectorCount, int updateInterva
     QRandomGenerator *rng = QRandomGenerator::global();
     
     for (int i = 0; i < detectorCount; ++i) {
-        m_currentValues[i] = rng->bounded(1000) / 100.0f;
+        m_currentValues[i] = rng->bounded(10000) / 200.0f;
     }
     
     emit detectorsInitialized(detectorCount);
@@ -24,10 +24,10 @@ void DetectorDataGenerator::startGeneration(int detectorCount, int updateInterva
     // Бесконечный цикл обновления
     while (!m_stopRequested) {
         for (int i = 0; i < m_currentValues.size(); ++i) {
-            float delta = (rng->generateDouble() - 0.5) * 2.0f;
+            float delta = (rng->generateDouble() - 0.5) * 3.0f;
             m_currentValues[i] += delta;
             
-            m_currentValues[i] = std::max(-50.0f, std::min(100.0f, m_currentValues[i]));
+            m_currentValues[i] = std::max(-60.0f, std::min(120.0f, m_currentValues[i]));
         }
         
         emit valuesUpdated(m_currentValues);

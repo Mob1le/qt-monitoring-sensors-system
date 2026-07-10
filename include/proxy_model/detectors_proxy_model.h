@@ -3,12 +3,17 @@
 #include <QDateTime>
 #include "detector_table_model.h"
 
-class NumericSortProxyModel : public QSortFilterProxyModel
+class DetectorsProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    explicit NumericSortProxyModel(QObject *parent = nullptr)
-        : QSortFilterProxyModel(parent) , m_minThreshold(20.0f), m_thresholdEnabled(true) {}
+    explicit DetectorsProxyModel(QObject *parent = nullptr) 
+        : QSortFilterProxyModel(parent) {};
+
+    void enableFiltration(bool flag)
+    {
+        m_thresholdEnabled = flag;
+    };
 
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
@@ -58,5 +63,5 @@ protected:
 
 private:
     bool m_thresholdEnabled;
-    float m_minThreshold;
+    float m_minThreshold = 50.0f;
 };

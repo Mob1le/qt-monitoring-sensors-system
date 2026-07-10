@@ -14,12 +14,13 @@ find_package(Qt5 REQUIRED COMPONENTS
 add_executable(${PROJECT_NAME} WIN32
     src/main.cpp
     src/main_window.cpp
+    src/detector_table_model.cpp
+    src/detector_data_generator.cpp
+
+    include/detector_data_generator.h
     include/main_window.h
     include/detector_table_model.h
-    src/detector_table_model.cpp
-    include/detector_data_generator.h
-    src/detector_data_generator.cpp
-    include/proxy_model/normal_sort_proxy_model.h
+    include/proxy_model/detectors_proxy_model.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
