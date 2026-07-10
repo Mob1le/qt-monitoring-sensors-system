@@ -1,12 +1,21 @@
 # qt-monitoring-sensors-system
 ТЕСТОВОЕ ЗАДАНИЕ: СИСТЕМА МОНИТОРИНГА ДАТЧИКОВ на Qt 5.15 C++
 
-## Инструкция по сборке
+## Инструкция по сборке (требуется qt5-base)
 В терминале (в директории проекта `qt-monitoring-sensors-system/`)
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
+Для Linux
+```bash
+./build/qt-monitoring-sensors-system
+```
+Для Windows
+```cmd
+build\qt-monitoring-sensors-system.exe
+```
+
 
 ## Структура проекта
 
@@ -14,8 +23,16 @@ cmake --build build
 treeView-beta
 "qt-monitoring-sensors-system/"
     "src/"
+        "detector_data_generator.cpp"
+        "detector_table_model.cpp"
+        "main_window.cpp"
+        "main.cpp"
     "include/"
-      "proxy_model/"
+        "detector_data_generator.h"
+        "detector_table_model.h"
+        "main_window.h"
+        "proxy_model/"
+            "detectors_proxy_model.h"
 "CMakeLists.txt"
 ```
 
@@ -24,8 +41,8 @@ treeView-beta
 ```mermaid
 flowchart BT
     UI_MW[MainWindow]
-    UI_Stats[StatisticsPanel]
-    UI_Table[QTableView]
+    UI_Stats[[StatisticsPanel]]
+    UI_Table[[QTableView]]
     
     Core_Model[(DetectorTableModel)]
     Core_Generator[DetectorDataGenerator]
