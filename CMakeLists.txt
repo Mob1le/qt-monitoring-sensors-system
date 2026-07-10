@@ -13,7 +13,7 @@ find_package(Qt5 REQUIRED COMPONENTS
     Gui
 )
 
-add_executable(${PROJECT_NAME} WIN32
+add_executable(${PROJECT_NAME}
     src/main.cpp
     src/main_window.cpp
     src/detector_table_model.cpp
