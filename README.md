@@ -1,141 +1,42 @@
 # qt-monitoring-sensors-system
 ТЕСТОВОЕ ЗАДАНИЕ: СИСТЕМА МОНИТОРИНГА ДАТЧИКОВ на Qt 5.15 C++
 
-
-# 📋 План разработки Qt-приложения для мониторинга данных с виртуальных датчиков
-
-## 🧩 1. Предварительная подготовка
-- [x] Создать структуру проекта (`CMakeLists.txt`)
-- [x] Настроить базовые настройки Qt ( Widgets + Core + Gui)
-- [x] Создать папки: `src/`, `include/`
-- [x] Установить базовые настройки компилятора и линковщика
-
----
-
-## 🔧 2. Модуль данных (Data Model)
-
-### 2.1. Класс `Detector`
-- [x] Добавить конструкторы: по умолчанию, с параметрами, копирования
-- [x] Реализовать getter'ы и setter'ы для всех полей
-
-### 2.2. Модель данных `DetectorDataModel`
-- [x] Наследование от `QAbstractTableModel`
-- [x] Реализация основных методов:
-  - [x] `rowCount()`, `columnCount()`
-  - [x] `data()`, `headerData()`
-- [x] Добавить метод `addData(const Detector&)` с использованием `QMutex`
-
-### 2.3. Кэширование данных
-- [x] Использовать `QHash` (все 10 000 записей должны оставаться в памяти)
-- [x] Автоматическая валидация через типы Qt (qint64 гарантирует диапазон)
-
----
-
-## 🌐 3. Модуль генерации данных
-
-### 3.1. Генератор данных `DetectorGenerator`
-- [ ] Наследование от `QObject`
-- [ ] Создание метода `start()` для запуска генерации
-- [ ] Генерация ID начиная с 1 (уникальные)
-- [ ] Генерация случайных значений `float` (например, от -100.0 до 100.0)
-- [ ] Генерация текущего времени через `QDateTime::currentDateTime()`
-
-### 3.2. Многопоточность
-- [ ] Использование `QThread` для выполнения генерации в фоновом потоке
-- [ ] Реализация сигнала `dataGenerated(const Detector&)`
-- [ ] Настройка интервала между отправкой данных (например, 10–100 мс)
-- [ ] Корректная остановка потока ( сигнал `finished()`, `quit()`, `wait()` )
-
----
-
-## 📊 4. Модуль статистики
-
-### 4.1. Калькулятор статистики `StatisticsCalculator`
-- [ ] Хранение промежуточных значений:
-  - [ ] Счетчик датчиков (`int`)
-  - [ ] Сумма всех значений (`float`)
-  - [ ] Минимальное/максимальное значения (`float`)
-- [ ] Реализация метода `update(const Detector&)` с `QMutex` для потокобезопасности
-- [ ] Метод `calculateAverage()` для получения среднего значения
-- [ ] Сигнал `statisticsUpdated(int count, float avg, float min, float max)`
-
-### 4.2. Обработка событий
-- [ ] Подключение сигнала от генератора к слоту калькулятора
-- [ ] Подключение сигнала статистики к UI-элементам
-
----
-
-## 🖥️ 5. Интерфейс пользователя (UI)
-
-### 5.1. `MainWindow` (основной класс)
-- [x] Размещение `QTableView` в центре
-- [x] Добавление панели статистики ( QLabel + layout )
-- [x] Подключение кнопки «Старт/Стоп» для управления генератором
-
-### 5.2. Таблица
-- [x] Использование `QSortFilterProxyModel` для сортировки
-- [ ] Настройка delegate'ов для форматирования отображения:
-  - [ ] `QDateTime` (короткий формат времени)
-  - [ ] `float` (2 знака после запятой)
-
-### 5.3. Статистика
-- [ ] Отображение:
-  - [ ] Количество активных датчиков
-  - [ ] Среднее значение
-  - [ ] Минимум/Максимум
-- [ ] Автоматическое обновление при поступлении новых данных
-
-### 5.4. Сигналы/Слоты
-- [ ] Соединение `DetectorGenerator::dataGenerated` → `StatisticsCalculator::update` и `DetectorDataModel::addData`
-- [ ] Соединение `StatisticsCalculator::statisticsUpdated` → UI-обновление
-- [ ] Настройка соединений через `Qt::QueuedConnection` для межпоточности
-
-## 🧪 6. Тестирование и отладка
-
-### 6.1. Тестирование модулей
-- [ ] Тест генератора (проверка корректности ID и значений)
-- [ ] Тест модели (проверка добавления/удаления данных)
-- [ ] Тест статистики (проверка вычислений)
-
----
+## Инструкция по сборке
+В терминале (в директории проекта `qt-monitoring-sensors-system/`)
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
 
 ## Структура проекта
 
 ```mermaid
 treeView-beta
 "qt-monitoring-sensors-system/"
-    "build/"
     "src/"
     "include/"
-    "tests/"
-        "CMakeLists.txt"
+      "proxy_model/"
 "CMakeLists.txt"
 ```
 
 ## Архитектура проекта
 
 ```mermaid
-flowchart
+flowchart BT
     UI_MW[MainWindow]
     UI_Stats[StatisticsPanel]
     UI_Table[QTableView]
     
-    Core_Model[(DetectorDataModel)]
-    Core_Generator[DetectorGenerator]
-    Core_Stats[StatisticsCalculator]
-    Core_Detector[Detector]
+    Core_Model[(DetectorTableModel)]
+    Core_Generator[DetectorDataGenerator]
+    Service_Proxy[ProxyModel]
 
-    Core_Generator --> Core_Detector
-    UI_MW --> UI_Stats
-    UI_MW --> UI_Table
-    
+    UI_Stats --> UI_MW
+    Core_Model --> Service_Proxy
+    Service_Proxy --> UI_Table
+    UI_Table --> UI_MW
     Core_Generator e1@--> Core_Model
-    Core_Stats --> Core_Model
-
-    UI_Stats --> Core_Stats
-
-    UI_Table --> Core_Model
-    Core_Model --> Core_Detector
+    Core_Model --> UI_Stats
     
     e1@{ animation: fast }
 ```

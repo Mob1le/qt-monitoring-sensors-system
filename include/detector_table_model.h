@@ -3,6 +3,9 @@
 #include <QMutex>
 #include <QVector>
 #include <QDateTime>
+#include <algorithm>
+#include <limits>
+#include <numeric>
 
 struct DetectorData {
     int id;

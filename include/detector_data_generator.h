@@ -1,6 +1,11 @@
 #pragma once
 #include <QObject>
 #include <QVector>
+#include <QRandomGenerator>
+#include <QThread>
+#include <QCoreApplication>
+#include <cmath>
+#include <algorithm>
 
 class DetectorDataGenerator : public QObject {
     Q_OBJECT

@@ -1,9 +1,4 @@
 #include "detector_data_generator.h"
-#include <QRandomGenerator>
-#include <QThread>
-#include <QCoreApplication>
-#include <cmath>
-#include <algorithm>
 
 DetectorDataGenerator::DetectorDataGenerator(QObject *parent)
     : QObject(parent) {}

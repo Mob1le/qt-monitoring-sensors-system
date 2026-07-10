@@ -9,6 +9,8 @@ set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5 REQUIRED COMPONENTS
     Widgets
+    Core
+    Gui
 )
 
 add_executable(${PROJECT_NAME} WIN32
@@ -25,8 +27,17 @@ add_executable(${PROJECT_NAME} WIN32
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/proxy_model
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt5::Widgets
+    Qt5::Core
+    Qt5::Gui
+)
+
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -Wall
+    -Wextra
+    -pedantic
 )

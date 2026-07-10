@@ -22,15 +22,15 @@ protected:
         QVariant rightData = sourceModel()->data(right, Qt::UserRole);
 
         // Сортируем по типу данных
-        switch (leftData.type())
+        switch (leftData.userType())
         {
-        case QVariant::Int:
+        case QMetaType::Int:
             return leftData.toInt() < rightData.toInt();
 
         case QMetaType::Float:
             return leftData.toFloat() < rightData.toFloat();
 
-        case QVariant::DateTime:
+        case QMetaType::QDateTime:
             return leftData.toDateTime() < rightData.toDateTime();
 
         default:

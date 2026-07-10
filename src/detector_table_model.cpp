@@ -1,7 +1,4 @@
 #include "detector_table_model.h"
-#include <algorithm>
-#include <limits>
-#include <numeric>
 
 DetectorTableModel::DetectorTableModel(QObject *parent)
     : QAbstractTableModel(parent) {}
@@ -61,7 +58,7 @@ void DetectorTableModel::initDetectors(int count) {
             DetectorData data;
             data.id = i + 1;
             data.timestamp = now;
-            data.value = 0.0f;  // Начальные значения
+            data.value = 0.0f;
             m_data.append(data);
         }
         invalidateStats();
