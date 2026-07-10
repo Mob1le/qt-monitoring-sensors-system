@@ -30,9 +30,6 @@ void MainWindow::setupUI() {
     m_stopButton = new QPushButton("Стоп", this);
     m_stopButton->setEnabled(false);
     
-    m_startButton->setMinimumHeight(40);
-    m_stopButton->setMinimumHeight(40);
-    
     btnLayout->addWidget(m_startButton);
     btnLayout->addWidget(m_stopButton);
     btnLayout->addStretch();
@@ -76,7 +73,7 @@ void MainWindow::setupUI() {
 
     m_tableView->setAlternatingRowColors(true);
     m_tableView->horizontalHeader()->setStretchLastSection(true);
-    m_tableView->verticalHeader()->setVisible(false);  // Скрываем номера строк
+    m_tableView->verticalHeader()->setVisible(false);
     
     // Оптимизация для большого количества строк
     m_tableView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
@@ -111,10 +108,9 @@ void MainWindow::onStartClicked() {
     m_startButton->setEnabled(false);
     m_stopButton->setEnabled(true);
     
-    // Очищаем старые данные
     m_model->clearData();
     
-    // Запускаем генерацию 10000 датчиков с обновлением каждые 50 мс
+    // Запускаем генерацию
     QMetaObject::invokeMethod(m_generator, "startGeneration",
                              Qt::QueuedConnection,
                              Q_ARG(int, 10000),   // количество датчиков
@@ -129,7 +125,7 @@ void MainWindow::onStopClicked() {
 
 void MainWindow::onDetectorsInitialized(int count) {
     m_model->initDetectors(count);
-    setWindowTitle(QString("10000 Detectors Monitor - Initialized %1 detectors").arg(count));
+    setWindowTitle(QString("Detectors Monitor - Initialized %1 detectors").arg(count));
 }
 
 void MainWindow::onValuesUpdated(const QVector<float> &newValues) {

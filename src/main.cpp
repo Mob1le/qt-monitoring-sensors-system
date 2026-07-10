@@ -9,8 +9,6 @@ int main(int argc, char *argv[]) {
     qRegisterMetaType<QVector<DetectorData>>("QVector<DetectorData>");
     qRegisterMetaType<QVector<float>>("QVector<float>");
     
-    app.setStyle("Fusion");
-    
     MainWindow window;
     window.show();
     
